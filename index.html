@@ -3,16 +3,1429 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Movies Website - Home</title>
+    <title>StreamFlix - Watch Movies & TV Shows Online</title>
+    
+    <style>
+        /* ═══════════════════════════════════════════════════════════════
+           GLOBAL STYLES
+           ═══════════════════════════════════════════════════════════════ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #141414;
+            color: #ffffff;
+            overflow-x: hidden;
+            padding-bottom: 0; 
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           HEADER SECTION
+           ═══════════════════════════════════════════════════════════════ */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 70px;
+            background-color: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 60px;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .header.scrolled {
+            background-color: #141414;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-logo {
+            width: 140px;
+            font-size: 32px;
+            font-weight: 900;
+            color: #E50914;
+            letter-spacing: -1px;
+            cursor: pointer;
+        }
+
+        .header-nav {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .header-nav a {
+            color: #e5e5e5;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .header-nav a:hover {
+            color: #b3b3b3;
+        }
+
+        .header-nav a.active {
+            color: #ffffff;
+            font-weight: 700;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            position: relative; /* For dropdown positioning */
+        }
+
+        /* --- SEARCH BAR STYLES --- */
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: transparent;
+            border: 1px solid transparent;
+            padding: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .search-box.active {
+            background-color: rgba(0,0,0,0.8);
+            border: 1px solid #ffffff;
+            padding: 5px 10px;
+        }
+
+        .search-input {
+            width: 0;
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            font-size: 14px;
+            outline: none;
+            transition: width 0.3s ease;
+            opacity: 0;
+        }
+
+        .search-box.active .search-input {
+            width: 200px;
+            opacity: 1;
+            margin-left: 10px;
+        }
+
+        .header-icon {
+            font-size: 20px;
+            color: #ffffff;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            background: none;
+            border: none;
+        }
+
+        .header-icon:hover {
+            color: #E50914;
+        }
+
+        /* --- PROFILE DROPDOWN STYLES --- */
+        .profile-container {
+            position: relative;
+        }
+
+        .header-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #E50914, #ff6b6b);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .header-avatar:hover {
+            border-color: #fff;
+        }
+
+        .profile-dropdown {
+            display: none; /* Hidden by default */
+            position: absolute;
+            top: 45px;
+            right: 0;
+            width: 180px;
+            background-color: rgba(0, 0, 0, 0.95);
+            border: 1px solid #333;
+            border-radius: 4px;
+            padding: 10px 0;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+            z-index: 1001;
+        }
+
+        .profile-dropdown.show {
+            display: block;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .profile-dropdown a {
+            display: block;
+            padding: 10px 20px;
+            color: #e5e5e5;
+            text-decoration: none;
+            font-size: 13px;
+            transition: background 0.2s;
+        }
+
+        .profile-dropdown a:hover {
+            background-color: #333;
+            color: #fff;
+            text-decoration: underline;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background-color: #333;
+            margin: 5px 0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           MOBILE BOTTOM NAVIGATION
+           ═══════════════════════════════════════════════════════════════ */
+        .mobile-bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 65px;
+            background-color: #121212;
+            border-top: 1px solid #333;
+            z-index: 2000;
+            justify-content: space-around;
+            align-items: center;
+            padding-bottom: 5px;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #808080;
+            text-decoration: none;
+            font-size: 10px;
+            gap: 4px;
+            width: 20%;
+        }
+
+        .nav-item.active {
+            color: #ffffff;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           HERO SECTION
+           ═══════════════════════════════════════════════════════════════ */
+        .hero-section {
+            position: relative;
+            width: 100%;
+            height: 85vh;
+            margin-top: 0;
+            overflow: hidden;
+            scroll-margin-top: 70px;
+        }
+
+        .hero-slider-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .hero-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 1s ease-in-out, visibility 1s ease-in-out;
+            z-index: 1;
+        }
+
+        .hero-slide.active {
+            opacity: 1;
+            visibility: visible;
+            z-index: 2;
+        }
+
+        .hero-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .hero-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            animation: zoomEffect 20s infinite alternate;
+        }
+
+        @keyframes zoomEffect {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.1); }
+        }
+
+        .hero-gradient {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to top, #141414 0%, transparent 20%),
+                        linear-gradient(to right, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 60%);
+            z-index: 2;
+        }
+
+        .hero-content {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            left: 60px;
+            z-index: 4;
+            width: 45%;
+            padding-right: 20px;
+        }
+
+        .age-rating {
+            display: inline-block;
+            background-color: rgba(51, 51, 51, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 2px;
+            margin-bottom: 20px;
+        }
+
+        .hero-title-text {
+            font-size: 60px;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.8);
+        }
+        
+        .hero-synopsis {
+            font-size: 18px;
+            line-height: 1.5;
+            color: #ffffff;
+            margin-bottom: 25px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .hero-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 35px;
+            font-size: 18px;
+            font-weight: 700;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-play {
+            background-color: #ffffff;
+            color: #000000;
+        }
+
+        .btn-play:hover {
+            background-color: rgba(255, 255, 255, 0.75);
+        }
+
+        .btn-info {
+            background-color: rgba(109, 109, 110, 0.7);
+            color: #ffffff;
+        }
+
+        .btn-info:hover {
+            background-color: rgba(109, 109, 110, 0.4);
+        }
+
+        .slider-dots {
+            position: absolute;
+            right: 60px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 5;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            background-color: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .dot.active {
+            background-color: #fff;
+            transform: scale(1.5);
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           CONTENT SECTIONS
+           ═══════════════════════════════════════════════════════════════ */
+        .content-section {
+            padding: 20px 0;
+            background-color: #141414;
+            position: relative;
+            z-index: 10;
+            scroll-margin-top: 70px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #e5e5e5;
+            margin-bottom: 15px;
+            padding-left: 60px;
+            transition: color 0.3s;
+        }
+        
+        .section-title:hover {
+            color: #fff;
+        }
+
+        .card-row {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scroll-behavior: smooth;
+            padding: 0 60px 40px 60px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .card-row::-webkit-scrollbar {
+            height: 0px;
+        }
+
+        .movie-card, .landscape-card, .top10-card {
+            cursor: pointer;
+        }
+
+        .movie-card {
+            flex: 0 0 200px;
+            position: relative;
+            border-radius: 4px;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .movie-card img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 4px;
+            display: block;
+        }
+
+        .movie-card:hover {
+            transform: scale(1.1);
+            z-index: 99;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.7);
+        }
+
+        .card-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .movie-card:hover .card-overlay {
+            opacity: 1;
+        }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .card-meta {
+            font-size: 10px;
+            color: #46d369;
+            font-weight: bold;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           TOP 10 SECTION
+           ═══════════════════════════════════════════════════════════════ */
+        .top10-card {
+            flex: 0 0 200px;
+            position: relative;
+            margin-left: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .top10-number {
+            position: absolute;
+            left: -20px;
+            bottom: -5px;
+            font-size: 180px;
+            font-weight: 900;
+            color: #000;
+            -webkit-text-stroke: 4px #595959;
+            z-index: 1;
+            line-height: 1;
+            font-family: impact, sans-serif;
+        }
+
+        .top10-card img {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+            border-radius: 4px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .top10-card:hover {
+            transform: scale(1.1);
+            z-index: 99;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           LANDSCAPE CARDS
+           ═══════════════════════════════════════════════════════════════ */
+        .landscape-card {
+            flex: 0 0 300px;
+            position: relative;
+            border-radius: 4px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .landscape-card img {
+            width: 100%;
+            height: 170px;
+            object-fit: cover;
+        }
+
+        .landscape-card:hover {
+            transform: scale(1.05);
+            z-index: 99;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.6);
+        }
+
+        .new-badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background-color: #E50914;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 3px 6px;
+            border-radius: 2px;
+            letter-spacing: 0.5px;
+        }
+
+        .landscape-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(0deg, rgba(0,0,0,0.9) 0%, transparent 100%);
+        }
+
+        .landscape-title {
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: rgba(255,255,255,0.3);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: #E50914;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           FOOTER
+           ═══════════════════════════════════════════════════════════════ */
+        .footer {
+            background-color: #0a0a0a;
+            padding: 60px 60px 100px 60px;
+            margin-top: 40px;
+            border-top: 1px solid #222;
+        }
+
+        .footer-content {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .footer-columns {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .footer-column ul {
+            list-style: none;
+        }
+
+        .footer-column li {
+            margin-bottom: 10px;
+        }
+
+        .footer-column a {
+            color: #757575;
+            text-decoration: none;
+            font-size: 13px;
+        }
+        
+        .footer-column a:hover {
+            text-decoration: underline;
+        }
+
+        .copyright {
+            color: #757575;
+            font-size: 12px;
+            margin-top: 20px;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           RESPONSIVE DESIGN (MOBILE PERFECT)
+           ═══════════════════════════════════════════════════════════════ */
+        @media (max-width: 768px) {
+            .header { 
+                padding: 0 20px; 
+                height: 60px;
+                background-color: transparent;
+            }
+            .header.scrolled { background-color: #000; }
+            .header-nav { display: none; }
+            .header-right { gap: 10px; } /* Tighten spacing on mobile */
+            .header-logo { width: 100px; font-size: 24px; }
+            .header-avatar { width: 28px; height: 28px; }
+            
+            /* Adjust search on mobile */
+            .search-box.active .search-input { width: 120px; }
+
+            .mobile-bottom-nav { display: flex; }
+            body { padding-bottom: 65px; }
+
+            /* Hide Footer on Mobile */
+            .footer { display: none !important; }
+
+            .hero-section { height: 65vh; }
+            .hero-content { 
+                width: 100%; 
+                left: 0; 
+                padding: 20px; 
+                bottom: 0;
+                top: auto;
+                transform: none;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-end;
+                height: 100%;
+                background: linear-gradient(to top, #141414 5%, transparent 95%);
+            }
+            .hero-logo { width: 70%; margin-bottom: 10px; align-self: center; }
+            .hero-title-text { font-size: 32px; text-align: center; }
+            .hero-synopsis { display: none; }
+            .hero-buttons { 
+                width: 100%; 
+                justify-content: center; 
+                margin-bottom: 20px; 
+            }
+            .hero-btn { 
+                padding: 8px 20px; 
+                font-size: 14px; 
+                flex: 1;
+                justify-content: center;
+                max-width: 160px;
+            }
+            .age-rating { display: none; }
+            .slider-dots { display: none; }
+
+            .section-title { 
+                padding-left: 20px; 
+                font-size: 16px; 
+                margin-top: 10px;
+                margin-bottom: 10px;
+            }
+            .card-row { 
+                padding: 0 20px 20px 20px; 
+                gap: 8px;
+            }
+            
+            .movie-card { flex: 0 0 130px; }
+            .movie-card img { height: 190px; }
+            
+            .top10-card { flex: 0 0 130px; margin-left: 15px; }
+            .top10-card img { height: 190px; }
+            .top10-number { font-size: 100px; left: -15px; }
+            
+            .landscape-card { flex: 0 0 220px; }
+            .landscape-card img { height: 125px; }
+        }
+    </style>
 </head>
 <body>
-    <h1>Welcome to Movies Website</h1>
-    <nav>
-        <a href="movies.html">Movies</a>
-        <a href="search.html">Search</a>
-        <a href="about.html">About</a>
-        <a href="contact.html">Contact</a>
-        <a href="privacy.html">Privacy</a>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         HEADER SECTION
+         ═══════════════════════════════════════════════════════════════ -->
+    <header class="header" id="header">
+        <div class="header-logo" onclick="window.location.reload()">STREAMFLIX</div>
+        
+        <nav>
+            <ul class="header-nav">
+                <li><a href="#home" class="active">Home</a></li>
+                <li><a href="#tvshows">TV Shows</a></li>
+                <li><a href="#movies">Movies</a></li>
+                <li><a href="#new">New & Popular</a></li>
+                <li><a href="#mylist">My List</a></li>
+            </ul>
+        </nav>
+        
+        <div class="header-right">
+            <!-- Search Box (Functional) -->
+            <div class="search-box" id="searchBox">
+                <button class="header-icon" id="searchBtn">🔍</button>
+                <input type="text" class="search-input" id="searchInput" placeholder="Titles, people, genres">
+            </div>
+
+            <span class="header-icon">🔔</span>
+
+            <!-- Profile Dropdown (Functional) -->
+            <div class="profile-container">
+                <div class="header-avatar" id="profileAvatar"></div>
+                <div class="profile-dropdown" id="profileDropdown">
+                    <a href="#account">Manage Profiles</a>
+                    <a href="#transfer">Transfer Profile</a>
+                    <a href="#account">Account</a>
+                    <a href="#help">Help Center</a>
+                    <div class="dropdown-divider"></div>
+                    <a href="#signout">Sign out of StreamFlix</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         HERO SECTION (Slider)
+         ═══════════════════════════════════════════════════════════════ -->
+    <section class="hero-section" id="home">
+        <div class="hero-slider-container" id="heroSlider">
+            
+            <div class="hero-slide active" data-index="0">
+                <div class="hero-background">
+                    <img src="https://image.tmdb.org/t/p/original/8ZTVqvKDQ8emSGUEMjsS4yHAwrp.jpg" class="hero-image" alt="Inception">
+                    <div class="hero-gradient"></div>
+                </div>
+                <div class="hero-content">
+                    <div class="age-rating">13+</div>
+                    <h1 class="hero-title-text" style="font-family: 'Arial Black'; color: #fff;">INCEPTION</h1>
+                    <p class="hero-synopsis">A thief who steals corporate secrets through dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.</p>
+                    <div class="hero-buttons">
+                        <button class="hero-btn btn-play" onclick="openPlayer()"><span>▶</span> Play</button>
+                        <button class="hero-btn btn-info" onclick="openDetails()"><span>ⓘ</span> More Info</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-slide" data-index="1">
+                <div class="hero-background">
+                    <img src="https://image.tmdb.org/t/p/original/t6HIqrRAclMCA60NsSmeqe9RmNV.jpg" class="hero-image" alt="Avatar">
+                    <div class="hero-gradient"></div>
+                </div>
+                <div class="hero-content">
+                    <div class="age-rating">13+</div>
+                    <h1 class="hero-title-text" style="color: #00d4ff;">AVATAR: THE WAY OF WATER</h1>
+                    <p class="hero-synopsis">Jake Sully lives with his newfound family formed on the extrasolar moon Pandora. Once a familiar threat returns to finish what was previously started, Jake must work with Neytiri.</p>
+                    <div class="hero-buttons">
+                        <button class="hero-btn btn-play" onclick="openPlayer()"><span>▶</span> Play</button>
+                        <button class="hero-btn btn-info" onclick="openDetails()"><span>ⓘ</span> More Info</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-slide" data-index="2">
+                <div class="hero-background">
+                    <img src="https://image.tmdb.org/t/p/original/56v2KjBlU4XaOv9rVYkJu64COcfe.jpg" class="hero-image" alt="Stranger Things">
+                    <div class="hero-gradient"></div>
+                </div>
+                <div class="hero-content">
+                    <div class="age-rating">16+</div>
+                    <h1 class="hero-title-text" style="color: #ff2a2a; text-shadow: 0 0 10px #ff0000;">STRANGER THINGS</h1>
+                    <p class="hero-synopsis">When a young boy vanishes, a small town uncovers a mystery involving secret experiments, terrifying supernatural forces, and one strange little girl.</p>
+                    <div class="hero-buttons">
+                        <button class="hero-btn btn-play" onclick="openPlayer()"><span>▶</span> Play</button>
+                        <button class="hero-btn btn-info" onclick="openDetails()"><span>ⓘ</span> More Info</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-slide" data-index="3">
+                <div class="hero-background">
+                    <img src="https://image.tmdb.org/t/p/original/4HodYYKEIsGOdinkGi2Ucz6X9i0.jpg" class="hero-image" alt="Spider-Man">
+                    <div class="hero-gradient"></div>
+                </div>
+                <div class="hero-content">
+                    <div class="age-rating">PG</div>
+                    <h1 class="hero-title-text" style="color: #ffcc00; -webkit-text-stroke: 1px black;">SPIDER-MAN</h1>
+                    <p class="hero-synopsis">Miles Morales catapults across the Multiverse, where he encounters a team of Spider-People charged with protecting its very existence.</p>
+                    <div class="hero-buttons">
+                        <button class="hero-btn btn-play" onclick="openPlayer()"><span>▶</span> Play</button>
+                        <button class="hero-btn btn-info" onclick="openDetails()"><span>ⓘ</span> More Info</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slider-dots">
+            <div class="dot active" onclick="goToSlide(0)"></div>
+            <div class="dot" onclick="goToSlide(1)"></div>
+            <div class="dot" onclick="goToSlide(2)"></div>
+            <div class="dot" onclick="goToSlide(3)"></div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         MOBILE BOTTOM NAVIGATION
+         ═══════════════════════════════════════════════════════════════ -->
+    <nav class="mobile-bottom-nav">
+        <a href="#home" class="nav-item active">
+            <span class="nav-icon">🏠</span>
+            <span>Home</span>
+        </a>
+        <a href="#tvshows" class="nav-item">
+            <span class="nav-icon">📺</span>
+            <span>TV Shows</span>
+        </a>
+        <a href="#movies" class="nav-item">
+            <span class="nav-icon">🎬</span>
+            <span>Movies</span>
+        </a>
+        <a href="#new" class="nav-item">
+            <span class="nav-icon">🔥</span>
+            <span>New</span>
+        </a>
+        <a href="#mylist" class="nav-item">
+            <span class="nav-icon">📂</span>
+            <span>My List</span>
+        </a>
     </nav>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         INDIAN MOVIES SECTIONS
+         ═══════════════════════════════════════════════════════════════ -->
+    
+    <!-- Blockbuster Action -->
+    <section class="content-section" id="movies">
+        <h2 class="section-title">Blockbuster Action</h2>
+        <div class="card-row">
+            <div class="movie-card" onclick="openMoviePage('RRR')">
+                <img src="https://image.tmdb.org/t/p/w500/nEufeZlyAOLqO2brrs0yeF1lgEO.jpg" alt="RRR">
+                <div class="card-overlay">
+                    <div class="card-title">RRR</div>
+                    <div class="card-meta">2022 • Action</div>
+                </div>
+            </div>
+            <div class="movie-card" onclick="openMoviePage('KGF 2')">
+                <img src="https://image.tmdb.org/t/p/w500/5dRZkQA3393kNSG5Iq7g9jCj0k0.jpg" alt="KGF Chapter 2">
+                <div class="card-overlay">
+                    <div class="card-title">K.G.F: Chapter 2</div>
+                    <div class="card-meta">2022 • Action</div>
+                </div>
+            </div>
+            <div class="movie-card" onclick="openMoviePage('Pathaan')">
+                <img src="https://image.tmdb.org/t/p/w500/m1b9bq7qxx9mzLCRdxW3jZ46nd9.jpg" alt="Pathaan">
+                <div class="card-overlay">
+                    <div class="card-title">Pathaan</div>
+                    <div class="card-meta">2023 • Spy Thriller</div>
+                </div>
+            </div>
+            <div class="movie-card" onclick="openMoviePage('Vikram')">
+                <img src="https://image.tmdb.org/t/p/w500/noPOqC78a2L8T76fF7R9Y2s2t5c.jpg" alt="Vikram">
+                <div class="card-overlay">
+                    <div class="card-title">Vikram</div>
+                    <div class="card-meta">2022 • Action</div>
+                </div>
+            </div>
+            <div class="movie-card" onclick="openMoviePage('War')">
+                <img src="https://image.tmdb.org/t/p/w500/7JeHrVL1oe5cn07d5V9bRyX3jF6.jpg" alt="War">
+                <div class="card-overlay">
+                    <div class="card-title">War</div>
+                    <div class="card-meta">2019 • Action</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Suspense & Thrillers -->
+    <section class="content-section">
+        <h2 class="section-title">Suspense & Thrillers</h2>
+        <div class="card-row">
+            <div class="movie-card" onclick="openMoviePage('Drishyam')">
+                <img src="https://image.tmdb.org/t/p/w500/gJ8313hTdbP3g4W0L5TjO5c2V5.jpg" alt="Drishyam">
+                <div class="card-overlay">
+                    <div class="card-title">Drishyam</div>
+                    <div class="card-meta">Thriller</div>
+                </div>
+            </div>
+            <div class="movie-card" onclick="openMoviePage('Andhadhun')">
+                <img src="https://image.tmdb.org/t/p/w500/dy3K6hNvpjqvnDww49ESiIsuN4.jpg" alt="Andhadhun">
+                <div class="card-overlay">
+                    <div class="card-title">Andhadhun</div>
+                    <div class="card-meta">Crime Thriller</div>
+                </div>
+            </div>
+            <div class="movie-card" onclick="openMoviePage('Special 26')">
+                <img src="https://image.tmdb.org/t/p/w500/vGv1XN2hCgR0J8uA4Q6X5w5Q6.jpg" alt="Special 26">
+                <div class="card-overlay">
+                    <div class="card-title">Special 26</div>
+                    <div class="card-meta">Heist</div>
+                </div>
+            </div>
+            <div class="movie-card" onclick="openMoviePage('A Wednesday')">
+                <img src="https://image.tmdb.org/t/p/w500/u1L2iI7oE2zK2Q8v2X3s4Q7.jpg" alt="A Wednesday">
+                <div class="card-overlay">
+                    <div class="card-title">A Wednesday!</div>
+                    <div class="card-meta">Thriller</div>
+                </div>
+            </div>
+            <div class="movie-card" onclick="openMoviePage('Baby')">
+                <img src="https://image.tmdb.org/t/p/w500/a3l9G5W5v5W5X5.jpg" alt="Baby" style="background:#333;">
+                <div class="card-overlay">
+                    <div class="card-title">Baby</div>
+                    <div class="card-meta">Espionage</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Comedy Movies -->
+    <section class="content-section">
+        <h2 class="section-title">Laugh Out Loud</h2>
+        <div class="card-row">
+            <div class="movie-card" onclick="openMoviePage('Hera Pheri')">
+                <img src="https://image.tmdb.org/t/p/w500/my7L6ZlO6k5.jpg" alt="Hera Pheri" style="object-position: top;">
+                <div class="card-overlay">
+                    <div class="card-title">Hera Pheri</div>
+                    <div class="card-meta">Cult Classic</div>
+                </div>
+            </div>
+            <div class="movie-card" onclick="openMoviePage('Bhool Bhulaiyaa')">
+                <img src="https://image.tmdb.org/t/p/w500/6v7W3r9j.jpg" alt="Bhool Bhulaiyaa" style="background:#333;">
+                <div class="card-overlay">
+                    <div class="card-title">Bhool Bhulaiyaa</div>
+                    <div class="card-meta">Comedy Horror</div>
+                </div>
+            </div>
+            <div class="movie-card" onclick="openMoviePage('Dhamaal')">
+                <img src="https://image.tmdb.org/t/p/w500/8tE4.jpg" alt="Dhamaal" style="background:#333;">
+                <div class="card-overlay">
+                    <div class="card-title">Dhamaal</div>
+                    <div class="card-meta">Comedy</div>
+                </div>
+            </div>
+            <div class="movie-card" onclick="openMoviePage('Fukrey')">
+                <img src="https://image.tmdb.org/t/p/w500/9g.jpg" alt="Fukrey" style="background:#333;">
+                <div class="card-overlay">
+                    <div class="card-title">Fukrey</div>
+                    <div class="card-meta">Comedy</div>
+                </div>
+            </div>
+            <div class="movie-card" onclick="openMoviePage('Housefull')">
+                <img src="https://image.tmdb.org/t/p/w500/2j.jpg" alt="Housefull" style="background:#333;">
+                <div class="card-overlay">
+                    <div class="card-title">Housefull</div>
+                    <div class="card-meta">Comedy</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Horror Movies -->
+    <section class="content-section">
+        <h2 class="section-title">Chilling Horror</h2>
+        <div class="card-row">
+            <div class="movie-card" onclick="openMoviePage('Tumbbad')">
+                <img src="https://image.tmdb.org/t/p/w500/6Gk3.jpg" alt="Tumbbad" style="background:#111;">
+                <div class="card-overlay">
+                    <div class="card-title">Tumbbad</div>
+                    <div class="card-meta">Masterpiece</div>
+                </div>
+            </div>
+            <div class="movie-card" onclick="openMoviePage('Stree')">
+                <img src="https://image.tmdb.org/t/p/w500/9k.jpg" alt="Stree" style="background:#111;">
+                <div class="card-overlay">
+                    <div class="card-title">Stree</div>
+                    <div class="card-meta">Horror Comedy</div>
+                </div>
+            </div>
+            <div class="movie-card" onclick="openMoviePage('The Nun')">
+                <img src="https://image.tmdb.org/t/p/w500/sFC1ElvoKgW.jpg" alt="The Nun">
+                <div class="card-overlay">
+                    <div class="card-title">The Nun</div>
+                    <div class="card-meta">Supernatural</div>
+                </div>
+            </div>
+            <div class="movie-card" onclick="openMoviePage('Conjuring')">
+                <img src="https://image.tmdb.org/t/p/w500/wVYREutTvI.jpg" alt="The Conjuring">
+                <div class="card-overlay">
+                    <div class="card-title">The Conjuring</div>
+                    <div class="card-meta">Horror</div>
+                </div>
+            </div>
+            <div class="movie-card" onclick="openMoviePage('Bhediya')">
+                <img src="https://image.tmdb.org/t/p/w500/p7.jpg" alt="Bhediya" style="background:#111;">
+                <div class="card-overlay">
+                    <div class="card-title">Bhediya</div>
+                    <div class="card-meta">Creature Comedy</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Romance Movies -->
+    <section class="content-section">
+        <h2 class="section-title">Romantic Hits</h2>
+        <div class="card-row">
+            <div class="movie-card" onclick="openMoviePage('Sita Ramam')">
+                <img src="https://image.tmdb.org/t/p/w500/wHq4tV85f47dE3qE9g7l.jpg" alt="Sita Ramam">
+                <div class="card-overlay">
+                    <div class="card-title">Sita Ramam</div>
+                    <div class="card-meta">Epic Love Story</div>
+                </div>
+            </div>
+            <div class="movie-card" onclick="openMoviePage('Ashiqui 2')">
+                <img src="https://image.tmdb.org/t/p/w500/4.jpg" alt="Aashiqui 2" style="background:#222;">
+                <div class="card-overlay">
+                    <div class="card-title">Aashiqui 2</div>
+                    <div class="card-meta">Musical Romance</div>
+                </div>
+            </div>
+            <div class="movie-card" onclick="openMoviePage('Kabir Singh')">
+                <img src="https://image.tmdb.org/t/p/w500/h.jpg" alt="Kabir Singh" style="background:#222;">
+                <div class="card-overlay">
+                    <div class="card-title">Kabir Singh</div>
+                    <div class="card-meta">Drama</div>
+                </div>
+            </div>
+            <div class="movie-card" onclick="openMoviePage('YJHD')">
+                <img src="https://image.tmdb.org/t/p/w500/1.jpg" alt="Yeh Jawaani Hai Deewani" style="background:#222;">
+                <div class="card-overlay">
+                    <div class="card-title">Yeh Jawaani Hai Deewani</div>
+                    <div class="card-meta">Rom-Com</div>
+                </div>
+            </div>
+            <div class="movie-card" onclick="openMoviePage('RHTDM')">
+                <img src="https://image.tmdb.org/t/p/w500/2.jpg" alt="Rehnaa Hai Terre Dil Mein" style="background:#222;">
+                <div class="card-overlay">
+                    <div class="card-title">Rehnaa Hai Terre Dil Mein</div>
+                    <div class="card-meta">Classic</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         NEW RELEASES (ID: new)
+         ═══════════════════════════════════════════════════════════════ -->
+    <section class="content-section" id="new">
+        <h2 class="section-title">New Releases</h2>
+        <div class="card-row">
+            <div class="landscape-card" onclick="openMoviePage('Dune2')">
+                <img src="https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?w=640&q=80" alt="New Release" loading="lazy">
+                <div class="new-badge">NEW</div>
+                <div class="landscape-overlay">
+                    <div class="landscape-title">Dune: Part Two</div>
+                    <div class="card-meta">Sci-Fi • 2024</div>
+                </div>
+            </div>
+            <div class="landscape-card" onclick="openMoviePage('Oppenheimer')">
+                <img src="https://images.unsplash.com/photo-1596727147705-54a9d099308a?w=640&q=80" alt="New Release" loading="lazy">
+                <div class="new-badge">NEW</div>
+                <div class="landscape-overlay">
+                    <div class="landscape-title">Oppenheimer</div>
+                    <div class="card-meta">Drama • 2023</div>
+                </div>
+            </div>
+            <div class="landscape-card" onclick="openMoviePage('Barbie')">
+                <img src="https://images.unsplash.com/photo-1599839575945-a9e5af0c3fa5?w=640&q=80" alt="New Release" loading="lazy">
+                <div class="new-badge">NEW</div>
+                <div class="landscape-overlay">
+                    <div class="landscape-title">Barbie</div>
+                    <div class="card-meta">Comedy • 2023</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         CONTINUE WATCHING (ID: tvshows)
+         ═══════════════════════════════════════════════════════════════ -->
+    <section class="content-section" id="tvshows">
+        <h2 class="section-title">Continue Watching</h2>
+        <div class="card-row">
+            <div class="landscape-card" onclick="openMoviePage('Breaking Bad')">
+                <img src="https://images.unsplash.com/photo-1605810230434-7631ac76ec81?w=640&q=80" alt="Continue">
+                <div class="landscape-overlay">
+                    <div class="landscape-title">Breaking Bad</div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 65%;"></div>
+                </div>
+            </div>
+            <div class="landscape-card" onclick="openMoviePage('Stranger Things')">
+                <img src="https://images.unsplash.com/photo-1534809027769-b00d750a6bac?w=640&q=80" alt="Continue">
+                <div class="landscape-overlay">
+                    <div class="landscape-title">Stranger Things</div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 30%;"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         TRENDING SECTION
+         ═══════════════════════════════════════════════════════════════ -->
+    <section class="content-section">
+        <h2 class="section-title">Trending Now</h2>
+        <div class="card-row">
+            <div class="movie-card" onclick="openMoviePage('Dark Knight')">
+                <img src="https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg" alt="Movie" loading="lazy">
+                <div class="card-overlay">
+                    <div class="card-title">The Dark Knight</div>
+                    <div class="card-meta">98% Match</div>
+                </div>
+            </div>
+            <div class="movie-card" onclick="openMoviePage('Shawshank')">
+                <img src="https://image.tmdb.org/t/p/w500/q6y0Go1tsGEsmtFryDOJo3dEmqu.jpg" alt="Movie" loading="lazy">
+                <div class="card-overlay">
+                    <div class="card-title">The Shawshank Redemption</div>
+                    <div class="card-meta">99% Match</div>
+                </div>
+            </div>
+            <div class="movie-card" onclick="openMoviePage('Godfather')">
+                <img src="https://image.tmdb.org/t/p/w500/3bhkrj58Vtu7enYsRolD1fZdja1.jpg" alt="Movie" loading="lazy">
+                <div class="card-overlay">
+                    <div class="card-title">The Godfather</div>
+                    <div class="card-meta">98% Match</div>
+                </div>
+            </div>
+            <div class="movie-card" onclick="openMoviePage('LOTR')">
+                <img src="https://image.tmdb.org/t/p/w500/rCzpDGLbOoPwLjy3OAm5NUPOTrC.jpg" alt="Movie" loading="lazy">
+                <div class="card-overlay">
+                    <div class="card-title">The Lord of the Rings</div>
+                    <div class="card-meta">97% Match</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         TOP 10 MOVIES SECTION
+         ═══════════════════════════════════════════════════════════════ -->
+    <section class="content-section">
+        <h2 class="section-title">Top 10 Movies in India Today</h2>
+        <div class="card-row">
+            <div class="top10-card" onclick="openMoviePage('Top1')">
+                <div class="top10-number">1</div>
+                <img src="https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg" alt="Top 1" loading="lazy">
+            </div>
+            <div class="top10-card" onclick="openMoviePage('Top2')">
+                <div class="top10-number">2</div>
+                <img src="https://image.tmdb.org/t/p/w500/q6y0Go1tsGEsmtFryDOJo3dEmqu.jpg" alt="Top 2" loading="lazy">
+            </div>
+            <div class="top10-card" onclick="openMoviePage('Top3')">
+                <div class="top10-number">3</div>
+                <img src="https://image.tmdb.org/t/p/w500/3bhkrj58Vtu7enYsRolD1fZdja1.jpg" alt="Top 3" loading="lazy">
+            </div>
+            <div class="top10-card" onclick="openMoviePage('Top4')">
+                <div class="top10-number">4</div>
+                <img src="https://image.tmdb.org/t/p/w500/rCzpDGLbOoPwLjy3OAm5NUPOTrC.jpg" alt="Top 4" loading="lazy">
+            </div>
+            <div class="top10-card" onclick="openMoviePage('Top5')">
+                <div class="top10-number">5</div>
+                <img src="https://image.tmdb.org/t/p/w500/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg" alt="Top 5" loading="lazy">
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         MY LIST (ID: mylist)
+         ═══════════════════════════════════════════════════════════════ -->
+    <section class="content-section" id="mylist">
+        <h2 class="section-title">My List</h2>
+        <div class="card-row">
+            <div class="movie-card" onclick="openMoviePage('Dark Knight')">
+                <img src="https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg" alt="Movie">
+                <div class="card-overlay">
+                    <div class="card-title">The Dark Knight</div>
+                </div>
+            </div>
+            <div class="movie-card" onclick="openMoviePage('Interstellar')">
+                <img src="https://image.tmdb.org/t/p/w500/udDclJoHjfjb8Ekgsd4FDteOkCU.jpg" alt="Movie">
+                <div class="card-overlay">
+                    <div class="card-title">Interstellar</div>
+                </div>
+            </div>
+            <div class="movie-card" onclick="openMoviePage('Matrix')">
+                <img src="https://image.tmdb.org/t/p/w500/xBKGJQsAIeweesB79KC89FpBrVr.jpg" alt="Movie">
+                <div class="card-overlay">
+                    <div class="card-title">The Matrix</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         FOOTER (Hidden on mobile)
+         ═══════════════════════════════════════════════════════════════ -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-columns">
+                <div class="footer-column">
+                    <ul>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Investor Relations</a></li>
+                        <li><a href="#">Privacy</a></li>
+                        <li><a href="#">Speed Test</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <ul>
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Jobs</a></li>
+                        <li><a href="#">Cookie Preferences</a></li>
+                        <li><a href="#">Legal Notices</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <ul>
+                        <li><a href="#">Account</a></li>
+                        <li><a href="#">Ways to Watch</a></li>
+                        <li><a href="#">Corporate Information</a></li>
+                        <li><a href="#">Only on StreamFlix</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <ul>
+                        <li><a href="#">Media Center</a></li>
+                        <li><a href="#">Terms of Use</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                    </ul>
+                </div>
+            </div>
+            <p class="copyright">© 2024 StreamFlix, Inc.</p>
+        </div>
+    </footer>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         JAVASCRIPT
+         ═══════════════════════════════════════════════════════════════ -->
+    <script>
+        // --- Header Scroll Effect ---
+        const header = document.getElementById('header');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // --- Search Functionality ---
+        const searchBtn = document.getElementById('searchBtn');
+        const searchBox = document.getElementById('searchBox');
+        const searchInput = document.getElementById('searchInput');
+
+        searchBtn.addEventListener('click', () => {
+            searchBox.classList.toggle('active');
+            if(searchBox.classList.contains('active')) {
+                searchInput.focus();
+            }
+        });
+
+        // Handle Enter key in Search
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const query = searchInput.value;
+                if(query) {
+                    // Simulate search action
+                    console.log("Searching for:", query);
+                    window.location.href = 'movie_details.html?search=' + encodeURIComponent(query);
+                }
+            }
+        });
+
+        // --- Profile Dropdown Logic ---
+        const profileAvatar = document.getElementById('profileAvatar');
+        const profileDropdown = document.getElementById('profileDropdown');
+
+        profileAvatar.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent immediate closing
+            profileDropdown.classList.toggle('show');
+        });
+
+        // Close dropdown when clicking outside
+        window.addEventListener('click', () => {
+            if (profileDropdown.classList.contains('show')) {
+                profileDropdown.classList.remove('show');
+            }
+        });
+
+        // Prevent dropdown click from closing itself
+        profileDropdown.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+
+        // --- Mobile Navigation Highlight ---
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => {
+            item.addEventListener('click', function() {
+                navItems.forEach(n => n.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // --- Hero Slider Logic ---
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.hero-slide');
+        const dots = document.querySelectorAll('.dot');
+        const totalSlides = slides.length;
+        const intervalTime = 10000;
+
+        function showSlide(index) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            dots.forEach(dot => dot.classList.remove('active'));
+            slides[index].classList.add('active');
+            dots[index].classList.add('active');
+            currentSlide = index;
+        }
+
+        function nextSlide() {
+            let nextIndex = (currentSlide + 1) % totalSlides;
+            showSlide(nextIndex);
+        }
+
+        let slideInterval = setInterval(nextSlide, intervalTime);
+
+        function goToSlide(index) {
+            clearInterval(slideInterval);
+            showSlide(index);
+            slideInterval = setInterval(nextSlide, intervalTime);
+        }
+
+        // --- Click Logic for Movie Cards ---
+        function openMoviePage(movieName) {
+            console.log("Opening: " + movieName);
+            window.location.href = 'movie_details.html?title=' + encodeURIComponent(movieName);
+        }
+
+        function openPlayer() {
+            window.location.href = 'watch_movie.html';
+        }
+        function openDetails() {
+            window.location.href = 'movie_details.html';
+        }
+
+        // --- Horizontal Drag Scrolling ---
+        const cardRows = document.querySelectorAll('.card-row');
+        cardRows.forEach(row => {
+            let isDown = false;
+            let startX;
+            let scrollLeft;
+
+            row.addEventListener('mousedown', (e) => {
+                isDown = true;
+                row.style.cursor = 'grabbing';
+                startX = e.pageX - row.offsetLeft;
+                scrollLeft = row.scrollLeft;
+            });
+
+            row.addEventListener('mouseleave', () => {
+                isDown = false;
+                row.style.cursor = 'pointer';
+            });
+
+            row.addEventListener('mouseup', () => {
+                isDown = false;
+                row.style.cursor = 'pointer';
+            });
+
+            row.addEventListener('mousemove', (e) => {
+                if (!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - row.offsetLeft;
+                const walk = (x - startX) * 2;
+                row.scrollLeft = scrollLeft - walk;
+            });
+        });
+    </script>
 </body>
 </html>
